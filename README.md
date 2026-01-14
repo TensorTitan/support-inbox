@@ -1,4 +1,4 @@
-AI Powered Support Inbox
+## AI Powered Support Inbox
 
 An AI-powered support inbox system built using a microservice and event-driven architecture.
 The project simulates a real-world customer support workflow where messages are processed in real time and enriched asynchronously with AI-generated insights.
