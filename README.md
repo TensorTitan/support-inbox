@@ -1,81 +1,123 @@
-# support-inbox
 AI Powered Support Inbox
 
-This project is an AI powered support inbox system built using a microservice and event-driven architecture.
-The goal of the project is to simulate a real customer support workflow where messages are processed in real time and enriched asynchronously with AI generated insights.
+An AI-powered support inbox system built using a microservice and event-driven architecture.
+The project simulates a real-world customer support workflow where messages are processed in real time and enriched asynchronously with AI-generated insights.
 
-The system is designed for educational purposes and demonstrates usage of distributed systems, message queues, WebSockets and local large language models.
+This project is designed for educational purposes and demonstrates practical usage of:
 
-Project Description
+Distributed systems
 
-The application allows an operator to send and receive messages in a support inbox interface.
-Each message is stored immediately, while AI analysis is done in background without blocking the user.
+Message queues
 
-AI generates:
+Event-driven communication
 
-detected intent of the message
+WebSockets
 
-short summary
+Local Large Language Models (LLMs)
 
-suggested reply for the operator
+All AI processing is done locally using Ollama, with no external APIs or cloud dependencies.
 
-All AI processing is done locally using Ollama, without external APIs.
+Features
+
+Real-time support inbox UI
+
+Asynchronous AI message analysis
+
+Event-driven microservices architecture
+
+Local LLM inference via Ollama
+
+WebSocket updates with polling fallback
+
+Fault-tolerant AI processing
+
+AI Capabilities
+
+For each message, the AI generates:
+
+Detected intent
+
+Short summary
+
+Suggested reply for the operator
+
+AI processing never blocks the user experience.
 
 System Architecture
 
-The project is built as a set of independent services communicating through RabbitMQ.
+The system consists of independent services communicating via RabbitMQ.
 
-Main Components
+Frontend
+   |
+WebSocket / HTTP
+   |
+Gateway Service
+   |
+RabbitMQ (Events)
+   |
+---------------------------
+| Messaging Service       |
+| AI Worker               |
+---------------------------
+   |
+PostgreSQL
 
+Components
 Gateway Service
 
-Handles authentication using JWT
+Handles authentication (JWT)
 
 Manages WebSocket connections
 
-Sends messages to messaging service
+Forwards messages to Messaging Service
 
-Broadcasts AI completion events to frontend
+Broadcasts AI completion events to clients
 
 Messaging Service
 
 Stores conversations and messages in PostgreSQL
 
-Publishes message creation events
+Publishes message.created events
 
 Stores AI insights
 
-Provides conversation read model for UI
+Provides conversation read models for UI
 
 AI Worker
 
-Listens for message creation events
+Consumes message.created events
 
-Sends message content to local LLM
+Sends message content to local LLM via Ollama
 
-Parses and validates AI response
+Parses and validates AI output defensively
 
 Stores AI insights
 
-Publishes AI completion events
+Publishes ai.completed events
 
 RabbitMQ
 
-Event bus using topic exchanges
+Acts as the event bus
 
-Decouples services
+Uses topic exchanges
 
-Enables asynchronous processing
+Enables asynchronous and decoupled processing
 
 PostgreSQL
 
-Stores messages, conversations and AI insights
+Stores:
+
+Conversations
+
+Messages
+
+AI insights
 
 Frontend
 
 Simple operator inbox UI
 
-Uses WebSockets for real time updates
+Real-time updates via WebSockets
 
 Polling fallback for reliability
 
@@ -87,27 +129,29 @@ No internet or cloud dependency
 
 Event Flow
 
-Operator sends message from UI
+Operator sends a message from the UI
 
-Gateway forwards message to Messaging service
+Gateway forwards the message to Messaging Service
 
-Messaging service stores message
+Messaging Service stores the message
 
-Messaging service publishes message.created event
+Messaging Service publishes message.created event
 
-AI Worker consumes event and runs AI analysis
+AI Worker consumes the event
 
-AI insights are stored in database
+AI Worker runs AI analysis using Ollama
+
+AI insights are stored in PostgreSQL
 
 AI Worker publishes ai.completed event
 
-Gateway broadcasts update to connected clients
+Gateway broadcasts updates via WebSocket
 
 UI reloads conversation and displays AI output
 
-AI Processing
+AI Processing Details
 
-The AI Worker uses Ollama with local models such as:
+The AI Worker uses local Ollama models such as:
 
 tinyllama
 
@@ -115,19 +159,23 @@ phi3:mini
 
 llama3
 
-Because LLM output is not always strict JSON, defensive parsing is implemented:
+Defensive Parsing
 
-Markdown code blocks are removed
+Because LLM output is not always strict JSON:
 
-Extra text is stripped
+Markdown code blocks are stripped
 
-Invalid output is rejected safely
+Extra text is removed
 
-This prevents AI errors from breaking the system.
+Invalid output is safely rejected
+
+This ensures AI failures never break the system.
 
 Frontend Behavior
 
-The frontend shows AI status clearly:
+Messages appear instantly after sending
+
+AI status indicators:
 
 processing
 
@@ -135,18 +183,13 @@ available
 
 unavailable
 
-When a message is sent:
-
-message appears instantly
-
-AI status switches to processing
-
 UI polls backend until AI insight is available
 
-This approach ensures reliability even if WebSocket events are delayed.
+WebSocket updates provide real-time feedback
+
+Polling fallback ensures reliability if events are delayed
 
 Technology Stack
-
 Backend
 
 Python
@@ -184,36 +227,25 @@ Docker
 Docker Compose
 
 API Endpoints
-Gateway
-
+Gateway Service
 POST /login
-
 POST /messages
-
 WebSocket /ws
 
-Messaging
-
+Messaging Service
 POST /messages
-
 POST /ai-insights
-
 GET /conversations/{conversation_id}
 
 Environment Configuration
 
-All services use environment variables.
+All services are configured using environment variables.
 
-Important variables:
-
+Required Variables
 JWT_SECRET
-
 RABBITMQ_HOST
-
 MESSAGING_BASE_URL
-
 OLLAMA_URL
-
 OLLAMA_MODEL
 
 Running the Project
@@ -225,35 +257,360 @@ Docker Compose
 
 Ollama installed locally
 
-Start
+Start the System
 docker compose up --build
 
-Access
+Access Points
 
-Frontend: http://localhost
+Frontend UI: http://localhost
 
 Gateway API: http://localhost:8000
 
 Messaging API: http://localhost:8001
 
-RabbitMQ UI: http://localhost:15672
+RabbitMQ Management UI: http://localhost:15672
 
-Error Handling
+Error Handling & Reliability
 
-Automatic reconnect for RabbitMQ
+Automatic RabbitMQ reconnection
 
 AI failures do not block message delivery
 
 Invalid AI output is safely ignored
 
-UI falls back to polling if needed
+WebSocket + polling hybrid approach
+
+Event-driven design minimizes coupling
 
 Limitations
 
-Single node deployment
+Single-node deployment
+
+AI output quality depends on model choice
+
+Polling introduces a small delay
+
+No advanced role or permission management
+
+Purpose
+
+This project is intended as a learning reference for:
+
+Event-driven microservices
+
+Asynchronous AI processing
+
+Real-time systems
+
+Local LLM integration
+
+Fault-tolerant system design
+
+If you want, I can also:
+
+Add architecture diagrams
+
+Create a sequence diagram
+
+Split this into docs/ pages
+
+Write setup scripts
+
+Add API examples
+
+Turn it into a portfolio-ready project description
+
+Just tell me 👍
+
+that i could paste it in github straight
+
+Perfect — here is a GitHub-ready README.md, already formatted exactly how it should appear on GitHub.
+You can copy-paste this as-is into your repository.
+
+AI Powered Support Inbox
+
+An AI-powered support inbox system built using a microservice and event-driven architecture.
+The project simulates a real-world customer support workflow where messages are processed in real time and enriched asynchronously with AI-generated insights.
+
+This project is designed for educational purposes and demonstrates practical usage of:
+
+Distributed systems
+
+Message queues
+
+Event-driven communication
+
+WebSockets
+
+Local Large Language Models (LLMs)
+
+All AI processing is done locally using Ollama, with no external APIs or cloud dependencies.
+
+Features
+
+Real-time support inbox UI
+
+Asynchronous AI message analysis
+
+Event-driven microservices architecture
+
+Local LLM inference via Ollama
+
+WebSocket updates with polling fallback
+
+Fault-tolerant AI processing
+
+AI Capabilities
+
+For each message, the AI generates:
+
+Detected intent
+
+Short summary
+
+Suggested reply for the operator
+
+AI processing never blocks the user experience.
+
+System Architecture
+
+The system consists of independent services communicating via RabbitMQ.
+
+Frontend
+   |
+WebSocket / HTTP
+   |
+Gateway Service
+   |
+RabbitMQ (Events)
+   |
+---------------------------
+| Messaging Service       |
+| AI Worker               |
+---------------------------
+   |
+PostgreSQL
+
+Components
+Gateway Service
+
+Handles authentication using JWT
+
+Manages WebSocket connections
+
+Forwards messages to Messaging Service
+
+Broadcasts AI completion events to connected clients
+
+Messaging Service
+
+Stores conversations and messages in PostgreSQL
+
+Publishes message.created events
+
+Stores AI insights
+
+Provides conversation read models for the UI
+
+AI Worker
+
+Consumes message.created events
+
+Sends message content to local LLM via Ollama
+
+Parses and validates AI output defensively
+
+Stores AI insights
+
+Publishes ai.completed events
+
+RabbitMQ
+
+Acts as the event bus using topic exchanges
+
+Decouples services
+
+Enables asynchronous processing
+
+PostgreSQL
+
+Stores conversations, messages, and AI insights
+
+Frontend
+
+Simple operator inbox interface
+
+Uses WebSockets for real-time updates
+
+Polling fallback for reliability
+
+Ollama
+
+Runs local LLM models
+
+No internet or cloud dependency
+
+Event Flow
+
+Operator sends a message from the UI
+
+Gateway forwards the message to the Messaging Service
+
+Messaging Service stores the message
+
+Messaging Service publishes message.created event
+
+AI Worker consumes the event and runs AI analysis
+
+AI insights are stored in PostgreSQL
+
+AI Worker publishes ai.completed event
+
+Gateway broadcasts updates to connected clients
+
+UI reloads conversation and displays AI output
+
+AI Processing
+
+The AI Worker uses Ollama with local models such as:
+
+tinyllama
+
+phi3:mini
+
+llama3
+
+Defensive Parsing
+
+Because LLM output is not always strict JSON:
+
+Markdown code blocks are removed
+
+Extra text is stripped
+
+Invalid output is safely rejected
+
+This prevents AI errors from breaking the system.
+
+Frontend Behavior
+
+Messages appear instantly after sending
+
+AI status indicators:
+
+processing
+
+available
+
+unavailable
+
+UI polls backend until AI insights are available
+
+WebSocket updates are used when possible
+
+Polling fallback ensures reliability
+
+Technology Stack
+Backend
+
+Python
+
+FastAPI
+
+SQLAlchemy
+
+Messaging
+
+RabbitMQ
+
+Database
+
+PostgreSQL
+
+AI
+
+Ollama
+
+Local LLM models
+
+Frontend
+
+HTML
+
+CSS
+
+Vanilla JavaScript
+
+Infrastructure
+
+Docker
+
+Docker Compose
+
+API Endpoints
+Gateway Service
+POST /login
+POST /messages
+WebSocket /ws
+
+Messaging Service
+POST /messages
+POST /ai-insights
+GET /conversations/{conversation_id}
+
+Environment Configuration
+
+All services use environment variables.
+
+Required Variables
+JWT_SECRET
+RABBITMQ_HOST
+MESSAGING_BASE_URL
+OLLAMA_URL
+OLLAMA_MODEL
+
+Running the Project
+Requirements
+
+Docker
+
+Docker Compose
+
+Ollama installed locally
+
+Start the System
+docker compose up --build
+
+Access
+
+Frontend UI: http://localhost
+
+Gateway API: http://localhost:8000
+
+Messaging API: http://localhost:8001
+
+RabbitMQ Management UI: http://localhost:15672
+
+Error Handling
+
+Automatic RabbitMQ reconnect
+
+AI failures do not block message delivery
+
+Invalid AI output is safely ignored
+
+WebSocket + polling hybrid for reliability
+
+Limitations
+
+Single-node deployment
 
 AI output depends on model quality
 
-Polling adds small delay
+Polling introduces a small delay
 
-No advanced role management
+No advanced role or permission management
+
+License
+
+This project is provided for educational purposes.
