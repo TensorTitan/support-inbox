@@ -17,7 +17,7 @@ Local Large Language Models (LLMs)
 
 All AI processing is done locally using Ollama, with no external APIs or cloud dependencies.
 
-Features
+# Features
 
 Real-time support inbox UI
 
@@ -31,7 +31,7 @@ WebSocket updates with polling fallback
 
 Fault-tolerant AI processing
 
-AI Capabilities
+# AI Capabilities
 
 For each message, the AI generates:
 
@@ -43,7 +43,7 @@ Suggested reply for the operator
 
 AI processing never blocks the user experience.
 
-System Architecture
+# System Architecture
 
 The system consists of independent services communicating via RabbitMQ.
 
@@ -62,7 +62,7 @@ RabbitMQ (Events)
    |
 PostgreSQL
 
-Components
+# Components
 Gateway Service
 
 Handles authentication (JWT)
@@ -73,7 +73,7 @@ Forwards messages to Messaging Service
 
 Broadcasts AI completion events to clients
 
-Messaging Service
+# Messaging Service
 
 Stores conversations and messages in PostgreSQL
 
@@ -83,7 +83,7 @@ Stores AI insights
 
 Provides conversation read models for UI
 
-AI Worker
+# AI Worker
 
 Consumes message.created events
 
@@ -95,7 +95,7 @@ Stores AI insights
 
 Publishes ai.completed events
 
-RabbitMQ
+# RabbitMQ
 
 Acts as the event bus
 
@@ -103,7 +103,7 @@ Uses topic exchanges
 
 Enables asynchronous and decoupled processing
 
-PostgreSQL
+# PostgreSQL
 
 Stores:
 
@@ -113,7 +113,7 @@ Messages
 
 AI insights
 
-Frontend
+# Frontend
 
 Simple operator inbox UI
 
@@ -121,7 +121,7 @@ Real-time updates via WebSockets
 
 Polling fallback for reliability
 
-Ollama
+# Ollama
 
 Runs local LLM models
 
@@ -189,8 +189,8 @@ WebSocket updates provide real-time feedback
 
 Polling fallback ensures reliability if events are delayed
 
-Technology Stack
-Backend
+## Technology Stack
+# Backend
 
 Python
 
@@ -198,21 +198,21 @@ FastAPI
 
 SQLAlchemy
 
-Messaging
+# Messaging
 
 RabbitMQ
 
-Database
+# Database
 
 PostgreSQL
 
-AI
+# AI
 
 Ollama
 
 Local LLM models
 
-Frontend
+# Frontend
 
 HTML
 
@@ -220,13 +220,13 @@ CSS
 
 Vanilla JavaScript
 
-Infrastructure
+# Infrastructure
 
 Docker
 
 Docker Compose
 
-API Endpoints
+## API Endpoints
 Gateway Service
 POST /login
 POST /messages
