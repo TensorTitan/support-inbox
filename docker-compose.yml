@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -54,3 +55,9 @@ services:
       OLLAMA_MODEL: phi3:mini
       JWT_SECRET: change_me_super_secret
       JWT_EXPIRE_MINUTES: 120
+  frontend:
+    build: ./frontend
+    ports:
+    - "80:80"
+    depends_on:
+    - gateway
